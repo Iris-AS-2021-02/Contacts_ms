@@ -1,7 +1,7 @@
 # Contacts_Ms
 
 ## Configuration
-- Change database ip address connection from the AppSettings.json file
+- Change database IP address connection from AppSettings.json file
 
 ## Database Docker Commands
 - docker pull mcr.microsoft.com/mssql/server

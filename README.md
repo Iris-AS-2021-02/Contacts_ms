@@ -27,9 +27,10 @@
 - POST: /Contacts/ChangeOptions
 ```json
 {
-  "contactID": 0,
+  "contactID": 1,
   "blocked": true,
   "seeStatus": true,
-  "wallpaper": "string"
+  "extension" : "jpeg",
+  "URIwallpaper": "string with format => data:[<mediatype>][;base64],<data> => data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/"
 }
 ```

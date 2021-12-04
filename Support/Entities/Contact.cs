@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Support.Entities
         
         [Required]
         public bool SeeStatus { get; set; }
-        
+
         public string? Wallpaper { get; set; }
 
     }

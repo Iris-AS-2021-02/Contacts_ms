@@ -5,13 +5,13 @@ namespace BusinessLogic.ServiceContracts
 {
     public interface IContactService
     {
-        IEnumerable<Contact> GetContactsByUserId(int userId);
+        Task<IEnumerable<Contact>> GetContactsByUserId(int userId);
+
+        Task<Contact?> GetContactById(int contactId);
+
+        Task<IEnumerable<Contact>> SynchronizeContacts(IEnumerable<PhoneContact> phoneContacts, int userId);
         
-        Contact? GetContactById(int contactId);
-        
-        IEnumerable<Contact> SynchronizeContacts(IEnumerable<PhoneContact> phoneContacts, int userId);
-        
-        bool SetSettings(ContactSettings contactSettings);
+        Task<bool> SetSettings(ContactSettings contactSettings);
 
     }
 }

@@ -17,17 +17,17 @@ namespace Presentation.Controllers
 
         [HttpGet]
         [Route("GetContacts")]
-        public ActionResult<IEnumerable<Contact>> GetContactsByUser(int userId)
+        public async Task<ActionResult<IEnumerable<Contact>>> GetContactsByUser(int userId)
         {
-            var contacts = _contactService.GetContactsByUserId(userId);
+            var contacts = await _contactService.GetContactsByUserId(userId);
             return Ok(contacts);
         }
 
         [HttpGet]
         [Route("GetContact")]
-        public ActionResult<IEnumerable<Contact>> GetContactById(int contactId)
+        public async Task<ActionResult<IEnumerable<Contact>>> GetContactById(int contactId)
         {
-            var contact = _contactService.GetContactById(contactId);
+            var contact = await _contactService.GetContactById(contactId);
             if (contact is null)
                 return NotFound();
 
@@ -36,21 +36,21 @@ namespace Presentation.Controllers
 
         [HttpPost]
         [Route("Synchronize")]
-        public ActionResult<IEnumerable<Contact>> SynchronizeContacts([FromBody]IEnumerable<PhoneContact> phoneContacts, int userId)
+        public async Task<ActionResult<IEnumerable<Contact>>> SynchronizeContacts([FromBody]IEnumerable<PhoneContact> phoneContacts, int userId)
         {
-            var synchronizedContacts = _contactService.SynchronizeContacts(phoneContacts, userId);
+            var synchronizedContacts = await _contactService.SynchronizeContacts(phoneContacts, userId);
             return Ok(synchronizedContacts);
         }
 
         [HttpPost]
         [Route("ChangeOptions")]
-        public ActionResult SetSettings([FromBody] ContactSettings contactSettings)
+        public async Task<ActionResult> SetSettings([FromBody] ContactSettings contactSettings)
         {
             try
             {
-                var result = _contactService.SetSettings(contactSettings);
+                var result = await _contactService.SetSettings(contactSettings);
 
-                if(result)
+                if (result)
                     return Ok();
             }
             catch (Exception ex)

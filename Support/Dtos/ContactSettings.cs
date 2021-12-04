@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ namespace Support.Dtos
 
         public bool? SeeStatus { get; set; }
 
-        public string? Wallpaper { get; set; }
+        [RegularExpression(@"data:image/(?<type>.+?);base64,(?<data>.+)")]
+        public string? URIWallpaper { get; set; }
+
+        public string? Extension { get; set; }
     }
 }

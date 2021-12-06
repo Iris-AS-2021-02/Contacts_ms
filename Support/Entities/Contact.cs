@@ -11,10 +11,11 @@ namespace Support.Entities
     public class Contact
     {
         [Key]
-        public int ContactID { get; set; }
+        public Guid ContactID { get; set; }
 
         [Required] 
-        public int UserID { get; set; }
+        [StringLength(24)]
+        public string UserID { get; set; }
 
         [Required]
         [RegularExpression(@"^\+(?:[0-9]●?){6,14}[0-9]$", ErrorMessage = "Cell phone number format error.")]

@@ -6,7 +6,7 @@
 
 ## MicroService Docker Commands
 - docker build -t iris_contacts_ms .
-- docker run --name iris_contacts_ms -p 8080:80 iris_contacts_ms
+- docker run --name iris_contacts_ms -p 8088:8088 iris_contacts_ms
 
 ## Endpoints
 

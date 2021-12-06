@@ -17,7 +17,7 @@ namespace Presentation.Controllers
 
         [HttpGet]
         [Route("GetContacts")]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetContactsByUser(int userId)
+        public async Task<ActionResult<IEnumerable<Contact>>> GetContactsByUser(string userId)
         {
             var contacts = await _contactService.GetContactsByUserId(userId);
             return Ok(contacts);
@@ -25,7 +25,7 @@ namespace Presentation.Controllers
 
         [HttpGet]
         [Route("GetContact")]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetContactById(int contactId)
+        public async Task<ActionResult<IEnumerable<Contact>>> GetContactById(Guid contactId)
         {
             var contact = await _contactService.GetContactById(contactId);
             if (contact is null)
@@ -36,30 +36,44 @@ namespace Presentation.Controllers
 
         [HttpPost]
         [Route("Synchronize")]
-        public async Task<ActionResult<IEnumerable<Contact>>> SynchronizeContacts([FromBody]IEnumerable<PhoneContact> phoneContacts, int userId)
-        {
-            var synchronizedContacts = await _contactService.SynchronizeContacts(phoneContacts, userId);
-            return Ok(synchronizedContacts);
-        }
-
-        [HttpPost]
-        [Route("ChangeOptions")]
-        public async Task<ActionResult> SetSettings([FromBody] ContactSettings contactSettings)
+        public async Task<ActionResult<IEnumerable<Contact>>> SynchronizeContacts([FromBody]IEnumerable<PhoneContact> phoneContacts, string userId)
         {
             try
             {
-                var result = await _contactService.SetSettings(contactSettings);
-
-                if (result)
-                    return Ok();
+                var synchronizedContacts = await _contactService.SynchronizeContacts(phoneContacts, userId);
+                return Ok(synchronizedContacts);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.ToString());
             }
-            
-            return NotFound();
         }
 
+        [HttpPost]
+        [Route("ChangeOptions")]
+        public async Task<ActionResult<ContactSettingsResponse>> SetSettings([FromBody] ContactSettingsRequest contactSettings)
+        {
+            try
+            {
+                var result = await _contactService.SetSettings(contactSettings);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.ToString());
+            }
+        }
     }
 }

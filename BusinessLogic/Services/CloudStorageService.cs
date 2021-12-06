@@ -72,7 +72,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        public async Task<StorageObjectList?> GetStorageObjectList(int userID)
+        public async Task<StorageObjectList?> GetStorageObjectList(string userID)
         {
             using (var client = new HttpClient())
             {

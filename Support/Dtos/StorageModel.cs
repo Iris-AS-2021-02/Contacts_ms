@@ -8,9 +8,9 @@ namespace Support.Dtos
 {
     public class StorageModel
     {
-        public int SubFolder { get; set; }
+        public string SubFolder { get; set; }
 
-        public int ObjectId { get; set; }
+        public Guid ObjectId { get; set; }
 
         public byte[] Bytes { get; set; }
 

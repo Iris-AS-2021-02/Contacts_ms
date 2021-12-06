@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,9 +13,8 @@ namespace Support.Migrations
                 name: "Contacts",
                 columns: table => new
                 {
-                    ContactID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
+                    ContactID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserID = table.Column<string>(type: "nvarchar(24)", maxLength: 24, nullable: false),
                     ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContactName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Blocked = table.Column<bool>(type: "bit", nullable: false),

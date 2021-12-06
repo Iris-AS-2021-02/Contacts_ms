@@ -15,7 +15,7 @@ namespace BusinessLogic.ServiceContracts
 
         Task<StorageObject?> GetStorageObject(string urlStorageObject);
 
-        Task<StorageObjectList?> GetStorageObjectList(int userID);
+        Task<StorageObjectList?> GetStorageObjectList(string userID);
         
         Task<StorageObject?> UploadStorageObject(StorageModel storageModel);
     }

@@ -28,9 +28,10 @@
 ```json
 {
   "contactID": 1,
-  "blocked": true,
+  "blocked": false,
   "seeStatus": true,
+  "URIwallpaper": "string with format => data:[<mediatype>][;base64],<data> => data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/",
   "extension" : "jpeg",
-  "URIwallpaper": "string with format => data:[<mediatype>][;base64],<data> => data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/"
+  "removeCurrentWallpaper": false
 }
 ```

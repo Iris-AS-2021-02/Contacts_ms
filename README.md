@@ -6,20 +6,20 @@
 
 ## MicroService Docker Commands
 - docker build -t iris_contacts_ms .
-- docker run --name iris_contacts_ms -p 8088:88 iris_contacts_ms
+- docker run -d --name iris_contacts_ms -p 8088:88 iris_contacts_ms
 
 ## Endpoints
 
-- GET: /Contacts/GetContacts?userId=1
+- GET: /Contacts/GetContacts?userId=61a415a70c8dbe6a59316e93
 
-- GET: /Contacts/GetContact?contactId=1
+- GET: /Contacts/GetContact?contactId=a088423f-2d0c-4def-ca1e-08d9b907fa8c
 
-- POST: /Contacts/Synchronize?userId=1
+- POST: /Contacts/Synchronize?userId=61a415a70c8dbe6a59316e93
 ```json
 [
     {
-        "contactPhone": "string",
-        "contactName": "string"
+        "contactPhone": "+573057174334",
+        "contactName": "Harold Bartolo"
     }
 ]
 ```
@@ -27,7 +27,7 @@
 - POST: /Contacts/ChangeOptions
 ```json
 {
-  "contactID": 1,
+  "contactID": "a088423f-2d0c-4def-ca1e-08d9b907fa8c",
   "blocked": false,
   "seeStatus": true,
   "URIwallpaper": "string with format => data:[<mediatype>][;base64],<data> => data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/",

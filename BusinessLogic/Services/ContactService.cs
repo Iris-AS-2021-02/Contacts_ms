@@ -187,7 +187,7 @@ namespace BusinessLogic.Services
         {
             var dbContact = _repository.Contacts.GetById(contactSettings.ContactID);
             if (dbContact is null)
-                throw new KeyNotFoundException("User does not exist");
+                throw new KeyNotFoundException("Contact does not exist");
 
             dbContact.Blocked = contactSettings.Blocked ?? dbContact.Blocked;
             dbContact.SeeStatus = contactSettings.SeeStatus ?? dbContact.SeeStatus;

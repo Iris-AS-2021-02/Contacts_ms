@@ -25,7 +25,7 @@ namespace Presentation.Controllers
 
         [HttpGet]
         [Route("GetContact")]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetContactById(Guid contactId)
+        public async Task<ActionResult<Contact>> GetContactById(Guid contactId)
         {
             var contact = await _contactService.GetContactById(contactId);
             if (contact is null)

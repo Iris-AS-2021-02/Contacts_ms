@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Support.Dtos;
 using Support.Entities;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BusinessLogic.Services
@@ -62,13 +63,13 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<Contact>> SynchronizeContacts(IEnumerable<PhoneContact> phoneContacts, string userId)
         {
             //Start TODO: Hacer petición al Gateway
-            var usersURI = _configuration.GetSection("APIGateway").GetSection("Users_Ms").Value;
+            var APIGatewayURI = _configuration.GetSection("APIGatewayURI").Value;
 
             //TODO: solicitar metodo para verificar que el usuario existe
             //User user = null;
             //using (var client = new HttpClient())
             //{
-            //    client.BaseAddress = new Uri(usersURI);
+            //    client.BaseAddress = new Uri(APIGatewayURI);
             //    var result = await client.GetAsync($"user/find/{userId}");
 
             //    if (result.IsSuccessStatusCode)
@@ -84,18 +85,35 @@ namespace BusinessLogic.Services
             var numbersList = from phoneContact in phoneContacts select phoneContact.ContactPhone;
             string numbers = string.Join(",", numbersList);
 
-            
+            var queryObject = new
+            {
+                query = @"query {
+                    contactsByUserId (userId: """ + userId + @"""){
+                        contactID
+                        userID
+                        contactPhone
+                        contactName
+                        blocked
+                        seeStatus
+                        wallpaper
+                    }
+                }",
+                variables = new { }
+            };
+
+
             List<User>? activeUsers = new List<User>();
+
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(usersURI);
-                var result = await client.GetAsync($"user/find/{numbers}");
+                client.BaseAddress = new Uri(APIGatewayURI);
+                var result = await client.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
 
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var activeUserList = JsonConvert.DeserializeObject<ActiveUserList>(content);
-                    activeUsers = activeUserList?.Users ?? activeUsers;
+                    var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberGraphQlResponse>>(content);
+                    activeUsers = response?.Data.UsersWithNumber.Users;
                 }
             }
 

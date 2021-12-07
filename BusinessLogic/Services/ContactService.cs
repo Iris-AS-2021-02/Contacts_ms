@@ -85,33 +85,52 @@ namespace BusinessLogic.Services
             var numbersList = from phoneContact in phoneContacts select phoneContact.ContactPhone;
             string numbers = string.Join(",", numbersList);
 
-            var queryObject = new
-            {
-                query = @"query {
-                    usersWithNumber (numbers: """ + numbers + @"""){
-                        id
-                        Name
-                        Number
-                    }
-                }",
-                variables = new { }
-            };
+            //var queryObject = new
+            //{
+            //    query = @"query {
+            //        usersWithNumber (numbers: """ + numbers + @"""){
+            //            id
+            //            Name
+            //            Number
+            //        }
+            //    }",
+            //    variables = new { }
+            //};
 
 
+            //List<User>? activeUsers = new List<User>();
+
+            //using (var client = new HttpClient())
+            //{
+            //    client.BaseAddress = new Uri(APIGatewayURI);
+            //    var result = await client.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
+
+            //    if (result.IsSuccessStatusCode)
+            //    {
+            //        var content = await result.Content.ReadAsStringAsync();
+            //        var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberGraphQlResponse>>(content);
+            //        activeUsers = response?.Data.UsersWithNumber?.Users;
+            //    }
+            //}
+
+            // INICIO PRUEBA CONEXIÓN DIRECTA A MICROSERVICIO
+
+            var UsersMsURI = _configuration.GetSection("UsersMsURI").Value;
             List<User>? activeUsers = new List<User>();
-
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(APIGatewayURI);
-                var result = await client.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
+                client.BaseAddress = new Uri(UsersMsURI);
+                var result = await client.GetAsync($"user/find/{numbers}");
 
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberGraphQlResponse>>(content);
-                    activeUsers = response?.Data.UsersWithNumber?.Users;
+                    var activeUserList = JsonConvert.DeserializeObject<ActiveUserList>(content);
+                    activeUsers = activeUserList?.Users ?? activeUsers;
                 }
             }
+
+            // FIN PRUEBA CONEXIÓN DIRECTA A MICROSERVICIO
 
             var activeContacts = (
                 from activeUser in activeUsers

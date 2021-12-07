@@ -88,14 +88,10 @@ namespace BusinessLogic.Services
             var queryObject = new
             {
                 query = @"query {
-                    contactsByUserId (userId: """ + userId + @"""){
-                        contactID
-                        userID
-                        contactPhone
-                        contactName
-                        blocked
-                        seeStatus
-                        wallpaper
+                    usersWithNumber (numbers: """ + numbers + @"""){
+                        id
+                        Name
+                        Number
                     }
                 }",
                 variables = new { }
@@ -113,7 +109,7 @@ namespace BusinessLogic.Services
                 {
                     var content = await result.Content.ReadAsStringAsync();
                     var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberGraphQlResponse>>(content);
-                    activeUsers = response?.Data.UsersWithNumber.Users;
+                    activeUsers = response?.Data.UsersWithNumber?.Users;
                 }
             }
 

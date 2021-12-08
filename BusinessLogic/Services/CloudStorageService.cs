@@ -1,12 +1,7 @@
 ﻿using BusinessLogic.ServiceContracts;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Support.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Support.Dtos.CloudStorage;
 
 namespace BusinessLogic.Services
 {

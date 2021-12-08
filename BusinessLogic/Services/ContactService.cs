@@ -3,6 +3,8 @@ using DataAccess.RepositoryFactory;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Support.Dtos;
+using Support.Dtos.CloudStorage;
+using Support.Dtos.GraphQl;
 using Support.Entities;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -88,8 +90,8 @@ namespace BusinessLogic.Services
             var queryObject = new
             {
                 query = @"query {
-                    usersWithNumber (numbers: """ + numbers + @"""){
-                        id
+                    usersWithNumber (number: """ + numbers + @"""){
+                        ID
                         Name
                         Number
                     }
@@ -108,8 +110,8 @@ namespace BusinessLogic.Services
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberGraphQlResponse>>(content);
-                    activeUsers = response?.Data.UsersWithNumber?.Users;
+                    var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberQueryResponse>>(content);
+                    activeUsers = response?.Data.UsersWithNumber;
                 }
             }
 

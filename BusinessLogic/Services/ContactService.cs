@@ -111,7 +111,7 @@ namespace BusinessLogic.Services
                 {
                     var content = await result.Content.ReadAsStringAsync();
                     var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberQueryResponse>>(content);
-                    activeUsers = response?.Data.UsersWithNumber;
+                    activeUsers = response?.Data.UsersWithNumber ?? activeUsers;
                 }
             }
 

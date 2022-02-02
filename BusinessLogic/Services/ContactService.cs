@@ -6,6 +6,7 @@ using Support.Dtos;
 using Support.Dtos.CloudStorage;
 using Support.Dtos.GraphQl;
 using Support.Entities;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -65,7 +66,9 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<Contact>> SynchronizeContacts(IEnumerable<PhoneContact> phoneContacts, string userId)
         {
             //Start TODO: Hacer petición al Gateway
-            var APIGatewayURI = _configuration.GetSection("APIGatewayURI").Value;
+            var settings = _configuration.GetSection("APIGateway");
+            var APIGatewayURI = settings.GetSection("URI").Value;
+            var token = settings.GetSection("Token").Value;
 
             //TODO: solicitar metodo para verificar que el usuario existe
             //User user = null;
@@ -102,10 +105,12 @@ namespace BusinessLogic.Services
 
             List<User>? activeUsers = new List<User>();
 
-            using (var client = new HttpClient())
+            using (var httpClient = new HttpClient())
             {
-                client.BaseAddress = new Uri(APIGatewayURI);
-                var result = await client.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
+                httpClient.BaseAddress = new Uri(APIGatewayURI);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var result = await httpClient.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
 
                 if (result.IsSuccessStatusCode)
                 {

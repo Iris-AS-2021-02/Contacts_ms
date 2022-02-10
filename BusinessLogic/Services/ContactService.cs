@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Support.Dtos;
 using Support.Dtos.CloudStorage;
 using Support.Dtos.GraphQl;
+using Support.Dtos.UsersMS;
 using Support.Entities;
 using System.Net.Http.Headers;
 using System.Text;
@@ -18,7 +19,7 @@ namespace BusinessLogic.Services
         private readonly IRepositoryFactory _repository;
         private readonly ICloudStorageService _cloudStorageService;
         private CloudStorage? cloudStorage;
-        
+
 
         public ContactService(IConfiguration configuration, IRepositoryFactory repository, ICloudStorageService cloudStorageService)
         {
@@ -66,9 +67,7 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<Contact>> SynchronizeContacts(IEnumerable<PhoneContact> phoneContacts, string userId)
         {
             //Start TODO: Hacer petición al Gateway
-            var settings = _configuration.GetSection("APIGateway");
-            var APIGatewayURI = settings.GetSection("URI").Value;
-            var token = settings.GetSection("Token").Value;
+            var usersURI = _configuration.GetSection("Users_Ms").Value;
 
             //TODO: solicitar metodo para verificar que el usuario existe
             //User user = null;
@@ -86,37 +85,19 @@ namespace BusinessLogic.Services
             //if (user is null)
             //    throw new KeyNotFoundException("User does not exist");
 
-
             var numbersList = from phoneContact in phoneContacts select phoneContact.ContactPhone;
             string numbers = string.Join(",", numbersList);
 
-            var queryObject = new
-            {
-                query = @"query {
-                    usersWithNumber (number: """ + numbers + @"""){
-                        ID
-                        Name
-                        Number
-                    }
-                }",
-                variables = new { }
-            };
-
-
             List<User>? activeUsers = new List<User>();
-
             using (var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri(APIGatewayURI);
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var result = await httpClient.PostAsync("graphql", new StringContent(JsonConvert.SerializeObject(queryObject), Encoding.UTF8, "application/json"));
+                httpClient.BaseAddress = new Uri(usersURI);
+                var result = await httpClient.GetAsync($"user/find/{numbers}");
 
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var response = JsonConvert.DeserializeObject<GraphQLResponse<UsersWithNumberQueryResponse>>(content);
-                    activeUsers = response?.Data.UsersWithNumber ?? activeUsers;
+                    activeUsers = JsonConvert.DeserializeObject<List<User>>(content);
                 }
             }
 
@@ -133,10 +114,12 @@ namespace BusinessLogic.Services
 
             var currentContacts = _repository.Contacts.GetAll(x => x.UserID.Equals(userId));
 
-            var newContacts = from ac in activeContacts join cc in currentContacts on ac.Phone equals cc.ContactPhone into UsersContacts
-                              from uc in UsersContacts.DefaultIfEmpty() where uc is null
-                              select new Contact 
-                              { 
+            var newContacts = from ac in activeContacts
+                              join cc in currentContacts on ac.Phone equals cc.ContactPhone into UsersContacts
+                              from uc in UsersContacts.DefaultIfEmpty()
+                              where uc is null
+                              select new Contact
+                              {
                                   UserID = userId,
                                   ContactPhone = ac.Phone,
                                   ContactName = ac.Name,
@@ -145,7 +128,8 @@ namespace BusinessLogic.Services
                                   Wallpaper = null
                               };
 
-            var contacts = from ac in activeContacts join cc in currentContacts on ac.Phone equals cc.ContactPhone
+            var contacts = from ac in activeContacts
+                           join cc in currentContacts on ac.Phone equals cc.ContactPhone
                            select new Contact
                            {
                                ContactID = cc.ContactID,
@@ -158,8 +142,10 @@ namespace BusinessLogic.Services
                            };
 
 
-            var deletedContacts = from cc in currentContacts join ac in activeContacts on cc.ContactPhone equals ac.Phone into ContactsUsers
-                                  from cu in ContactsUsers.DefaultIfEmpty() where cu is null
+            var deletedContacts = from cc in currentContacts
+                                  join ac in activeContacts on cc.ContactPhone equals ac.Phone into ContactsUsers
+                                  from cu in ContactsUsers.DefaultIfEmpty()
+                                  where cu is null
                                   select cc;
 
 
@@ -194,7 +180,7 @@ namespace BusinessLogic.Services
 
             dbContact.Blocked = contactSettings.Blocked ?? dbContact.Blocked;
             dbContact.SeeStatus = contactSettings.SeeStatus ?? dbContact.SeeStatus;
-            
+
             if (contactSettings.removeCurrentWallpaper is true && contactSettings.URIWallpaper is null && dbContact.Wallpaper != null)
             {
                 await _cloudStorageService.DeleteStorageObject(dbContact.Wallpaper);
@@ -216,7 +202,7 @@ namespace BusinessLogic.Services
 
                 var wallpaper = new StorageModel { SubFolder = dbContact.UserID, ObjectId = contactSettings.ContactID, Bytes = bytes, MediaType = mediaType, Extension = contactSettings.Extension };
                 var storageObject = await _cloudStorageService.UploadStorageObject(wallpaper);
-                    
+
                 if (storageObject is null)
                     throw new Exception("Error storing the image");
 
@@ -224,7 +210,7 @@ namespace BusinessLogic.Services
                     await _cloudStorageService.DeleteStorageObject(dbContact.Wallpaper).ConfigureAwait(false);
 
                 dbContact.Wallpaper = storageObject.SelfLink;
-                
+
             }
             _repository.Contacts.Update(dbContact);
             _repository.Commit();
